@@ -80,7 +80,7 @@ def scrape_youtube_results(keywords, max_results_per_keyword, min_subs):
     return results, total_queries
 
 # Streamlit app interface
-st.title("YouTube Partnership Finder")
+st.title("YouTube Scrapper")
 
 # Input for keywords
 st.subheader("Enter Keywords")

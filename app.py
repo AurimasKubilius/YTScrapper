@@ -40,7 +40,7 @@ def login_page():
             cookies["username"] = username
             cookies.save()
             st.success(f"Welcome, {username}!")
-            st.experimental_rerun()  # Ensure the main app renders after login
+            st.rerun()  # Ensure the main app renders after login
         else:
             st.error("Invalid username or password.")
 
@@ -55,7 +55,7 @@ def authenticated_page():
         cookies["username"] = ""
         cookies.save()
         st.info("You have been logged out.")
-        st.experimental_rerun()  # Ensure the login page renders after logout
+        st.rerun()  # Ensure the login page renders after logout
 
 # Control flow
 if "authenticated" in st.session_state and st.session_state["authenticated"]:

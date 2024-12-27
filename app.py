@@ -5,7 +5,7 @@ import pandas as pd
 
 def main():
     """Main app logic."""
-    st.title("YouTube Partnership Finder")
+    st.title("YouTube Scrapper")
 
     st.subheader("Enter Keywords")
     keywords_input = st.text_area(

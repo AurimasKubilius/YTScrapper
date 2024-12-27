@@ -1,5 +1,6 @@
 streamlit
 google-api-python-client
 pandas
+streamlit-cookies-manager
 
 streamlit>=1.0.0

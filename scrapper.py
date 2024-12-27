@@ -3,7 +3,7 @@ from googleapiclient.discovery import build
 import streamlit as st
 
 # YouTube API details
-YOUTUBE_API_KEY = 'AIzaSyCXwOLRQ6NtAqX3uXqsUgw9gFLx64eD5Vs'
+YOUTUBE_API_KEY = st.secrets["general"]["YOUTUBE_API_KEY"]
 YOUTUBE_API_SERVICE_NAME = 'youtube'
 YOUTUBE_API_VERSION = 'v3'
 

@@ -3,12 +3,12 @@ from auth import login_required
 from scraper import scrape_youtube_results
 from utils import display_results
 
-# App title
-st.title("YouTube Scrapper")
+# Main app entry point
+st.title("YouTube Partnership Finder")
 
-# Login authentication
 if login_required():
-    # Input for keywords
+    # Show the main app after successful login
+    st.subheader("Enter Keywords")
     keywords_input = st.text_area(
         "Enter keywords (one per line):",
         placeholder="Type keywords here, one per line..."

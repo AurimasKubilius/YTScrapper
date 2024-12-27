@@ -1,6 +1,6 @@
 import streamlit as st
 from auth import login_page, authenticated_page
-from scrapper import scrape_youtube_results
+from scraper import scrape_youtube_results
 import pandas as pd
 
 def main():

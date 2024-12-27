@@ -7,8 +7,10 @@ def authenticate(username, password):
 
 def login_required():
     """Ensure the user is logged in before accessing the app."""
+    # Initialize session state keys
     if "authenticated" not in st.session_state:
         st.session_state["authenticated"] = False
+    if "username" not in st.session_state:
         st.session_state["username"] = None
 
     # If not authenticated, show the login form

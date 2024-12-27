@@ -1,7 +1,6 @@
 import streamlit as st
 from auth import login_page, logout
 
-# App Main Logic
 def main_app():
     """Render the main application interface."""
     st.sidebar.write(f"Logged in as: **{st.session_state['username']}**")

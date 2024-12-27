@@ -1,8 +1,8 @@
 import streamlit as st
 from streamlit_cookies_manager import EncryptedCookieManager
 
-# Set a secure password for cookie encryption
-COOKIE_PASSWORD = st.secrets["cookie_password"]  # Load password from secrets
+# Set a secure password for cookie encryption (load from Streamlit secrets)
+COOKIE_PASSWORD = st.secrets["cookie_password"]
 
 # Initialize the cookie manager
 cookies = EncryptedCookieManager(password=COOKIE_PASSWORD)
@@ -12,30 +12,28 @@ if not cookies.ready():
 
 def authenticate(username, password):
     """Authenticate user using Streamlit secrets."""
-    users = st.secrets.get("users", {})
+    users = st.secrets.get("users", {})  # Retrieve users from Streamlit secrets
     return username in users and users[username] == password
 
 def login_page():
-    """Render the login page."""
-    # Check if the user is already logged in via cookies
+    """Render the login page and manage login flow."""
+    # Restore state if already logged in via cookies
     if cookies.get("authenticated") == "true":
         st.session_state["authenticated"] = True
         st.session_state["username"] = cookies.get("username")
         return  # Skip rendering the login page if already logged in
 
     # Initialize session state for first-time users
-    if "authenticated" not in st.session_state:
-        st.session_state["authenticated"] = False
-    if "username" not in st.session_state:
-        st.session_state["username"] = None
+    st.session_state.setdefault("authenticated", False)
+    st.session_state.setdefault("username", None)
 
-    # Display the login form
+    # Display login form
     st.title("Login")
     username = st.text_input("Username", key="login_username")
     password = st.text_input("Password", type="password", key="login_password")
     if st.button("Login"):
         if authenticate(username, password):
-            # Set session state and cookies on successful login
+            # Update session state and cookies upon successful login
             st.session_state["authenticated"] = True
             st.session_state["username"] = username
             cookies["authenticated"] = "true"
@@ -46,7 +44,7 @@ def login_page():
             st.error("Invalid username or password.")
 
 def logout():
-    """Log out the user."""
+    """Log out the user and reset session state."""
     st.session_state["authenticated"] = False
     st.session_state["username"] = None
     cookies["authenticated"] = "false"

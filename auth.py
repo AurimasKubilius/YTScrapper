@@ -1,9 +1,8 @@
 import streamlit as st
 from streamlit_cookies_manager import EncryptedCookieManager
 
-# This should be unique to your app
-COOKIE_SECRET = "your_secret_key_here"
-cookies = EncryptedCookieManager(secret=COOKIE_SECRET)
+# Initialize cookies manager
+cookies = EncryptedCookieManager()
 
 if not cookies.ready():
     st.stop()
@@ -15,6 +14,7 @@ def authenticate(username, password):
 
 def login_page():
     """Render the login page."""
+    # Check for existing cookies
     if cookies.get("authenticated") == "true":
         st.session_state["authenticated"] = True
         st.session_state["username"] = cookies.get("username")

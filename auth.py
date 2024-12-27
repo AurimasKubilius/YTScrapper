@@ -18,6 +18,7 @@ def login_required():
             if authenticate(username, password):
                 st.session_state["authenticated"] = True
                 st.success("Login successful!")
+                # Properly rerun the app to reload with authentication
                 st.experimental_rerun()
             else:
                 st.error("Invalid username or password.")

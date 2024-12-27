@@ -2,7 +2,7 @@ import streamlit as st
 from streamlit_cookies_manager import EncryptedCookieManager
 
 # Set a secure password for cookie encryption (load from Streamlit secrets)
-COOKIE_PASSWORD = st.secrets["cookie_password"]
+COOKIE_PASSWORD = st.secrets["general"]["cookie_password"]
 
 # Initialize the cookie manager
 cookies = EncryptedCookieManager(password=COOKIE_PASSWORD)

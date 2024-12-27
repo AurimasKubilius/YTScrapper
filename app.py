@@ -4,7 +4,7 @@ from scraper import scrape_youtube_results
 from utils import display_results
 
 # App title
-st.title("YouTube Partnership Finder")
+st.title("YouTube Scrapper")
 
 # Login authentication
 if login_required():

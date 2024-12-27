@@ -1,4 +1,5 @@
 from googleapiclient.discovery import build
+import streamlit as st
 
 YOUTUBE_API_KEY = st.secrets["general"]["YOUTUBE_API_KEY"]
 

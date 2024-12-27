@@ -1,6 +1,7 @@
 import streamlit as st
 from auth import login_page, authenticated_page
-from scraper import scrape_youtube_results
+from scrapper import scrape_youtube_results
+import pandas as pd
 
 def main():
     """Main app logic."""
@@ -36,9 +37,21 @@ def main():
 
             # Call the scraper function
             results = scrape_youtube_results(keywords, max_results, min_subs)
+
+            # Convert results to a DataFrame for display
             if results:
+                df = pd.DataFrame(results)
                 st.success("Scraping complete!")
-                st.write(results)
+                st.dataframe(df)  # Display the table
+
+                # Add a download button for CSV
+                csv = df.to_csv(index=False)
+                st.download_button(
+                    label="Download Results as CSV",
+                    data=csv,
+                    file_name="youtube_results.csv",
+                    mime="text/csv",
+                )
             else:
                 st.warning("No results found.")
 

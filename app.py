@@ -1,13 +1,14 @@
 import streamlit as st
-from auth import login_page, authenticated_page
-from scraper import scrape_youtube_results
-import pandas as pd
 
 st.set_page_config(
     page_title="YouTube Scraper",
     page_icon="icon.png",
     layout="wide"
 )
+
+from auth import login_page, authenticated_page
+from scraper import scrape_youtube_results
+import pandas as pd
 
 def main():
     """Main app logic."""

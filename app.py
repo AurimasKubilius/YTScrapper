@@ -14,7 +14,6 @@ def main():
     """Main app logic."""
     st.title("YouTube Scrapper")
 
-    st.subheader("Enter Keywords")
     keywords_input = st.text_area(
         "Enter keywords (one per line):",
         placeholder="Type keywords here, one per line..."

@@ -15,44 +15,45 @@ def authenticate(username, password):
     users = st.secrets.get("users", {})
     return username in users and users[username] == password
 
+def get_session_key(username, key):
+    """Generate a user-specific session key."""
+    return f"{username}_{key}"
+
 def login_page():
     """Render the login page."""
     # Restore login state if cookies indicate user is already logged in
-    if cookies.get("authenticated") == "true":
-        st.session_state["authenticated"] = True
-        st.session_state["username"] = cookies.get("username")
-        return  # Skip rendering login form
+    username = cookies.get("username")
+    if username and cookies.get(f"{username}_authenticated") == "true":
+        st.session_state[get_session_key(username, "authenticated")] = True
+        st.session_state[get_session_key(username, "username")] = username
+        return username  # Skip rendering login form
 
-    # Initialize session state
-    if "authenticated" not in st.session_state:
-        st.session_state["authenticated"] = False
-    if "username" not in st.session_state:
-        st.session_state["username"] = None
-
+    # Initialize session state for the current user
     st.title("Login")
     username = st.text_input("Username", key="login_username")
     password = st.text_input("Password", type="password", key="login_password")
     if st.button("Login"):
         if authenticate(username, password):
-            st.session_state["authenticated"] = True
-            st.session_state["username"] = username
-            cookies["authenticated"] = "true"
+            user_session_key = get_session_key(username, "authenticated")
+            st.session_state[user_session_key] = True
+            st.session_state[get_session_key(username, "username")] = username
+            cookies[f"{username}_authenticated"] = "true"
             cookies["username"] = username
             cookies.save()
             st.success(f"Welcome, {username}!")
             st.rerun()  # Ensure the main app renders after login
+            return username
         else:
             st.error("Invalid username or password.")
+    return None
 
-def authenticated_page(logout_callback):
-    """Render the authenticated page with a logout option."""
-    st.sidebar.write(f"Logged in as: **{st.session_state['username']}**")
-    if st.sidebar.button("Logout"):
-        st.session_state["authenticated"] = False
-        st.session_state["username"] = None
-        cookies["authenticated"] = "false"
-        cookies["username"] = ""
-        cookies.save()
-        st.info("You have been logged out.")
-        st.rerun()  # Ensure the login page renders after logout
-    logout_callback()
+def logout(username):
+    """Log out the current user."""
+    user_session_key = get_session_key(username, "authenticated")
+    st.session_state[user_session_key] = False
+    st.session_state[get_session_key(username, "username")] = None
+    cookies[f"{username}_authenticated"] = "false"
+    cookies["username"] = ""
+    cookies.save()
+    st.info("You have been logged out.")
+    st.rerun()

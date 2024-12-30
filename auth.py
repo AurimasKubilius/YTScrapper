@@ -1,4 +1,5 @@
 import streamlit as st
+import uuid
 from streamlit_cookies_manager import EncryptedCookieManager
 
 # Set a secure password for cookie encryption
@@ -15,18 +16,19 @@ def authenticate(username, password):
     users = st.secrets.get("users", {})
     return username in users and users[username] == password
 
-def get_session_key(username, key):
-    """Generate a user-specific session key."""
-    return f"{username}_{key}"
+def generate_session_id():
+    """Generate a unique session ID."""
+    return str(uuid.uuid4())
 
 def login_page():
     """Render the login page."""
-    # Restore login state if cookies indicate user is already logged in
-    username = cookies.get("username")
-    if username and cookies.get(f"{username}_authenticated") == "true":
-        st.session_state[get_session_key(username, "authenticated")] = True
-        st.session_state[get_session_key(username, "username")] = username
-        return username  # Skip rendering login form
+    # Restore login state if session ID exists and matches
+    session_id = cookies.get("session_id")
+    if session_id and cookies.get("authenticated") == "true":
+        st.session_state["authenticated"] = True
+        st.session_state["username"] = cookies.get("username")
+        st.session_state["session_id"] = session_id
+        return st.session_state["username"]  # Skip rendering login form
 
     # Initialize session state for the current user
     st.title("Login")
@@ -34,11 +36,13 @@ def login_page():
     password = st.text_input("Password", type="password", key="login_password")
     if st.button("Login"):
         if authenticate(username, password):
-            user_session_key = get_session_key(username, "authenticated")
-            st.session_state[user_session_key] = True
-            st.session_state[get_session_key(username, "username")] = username
-            cookies[f"{username}_authenticated"] = "true"
+            session_id = generate_session_id()
+            st.session_state["authenticated"] = True
+            st.session_state["username"] = username
+            st.session_state["session_id"] = session_id
+            cookies["authenticated"] = "true"
             cookies["username"] = username
+            cookies["session_id"] = session_id
             cookies.save()
             st.success(f"Welcome, {username}!")
             st.rerun()  # Ensure the main app renders after login
@@ -47,13 +51,28 @@ def login_page():
             st.error("Invalid username or password.")
     return None
 
+def validate_session():
+    """Validate if the session ID in cookies matches the session state."""
+    session_id = cookies.get("session_id")
+    if not session_id or session_id != st.session_state.get("session_id"):
+        st.session_state["authenticated"] = False
+        st.session_state["username"] = None
+        st.session_state["session_id"] = None
+        cookies["authenticated"] = "false"
+        cookies["username"] = ""
+        cookies["session_id"] = ""
+        cookies.save()
+        return False
+    return True
+
 def logout(username):
     """Log out the current user."""
-    user_session_key = get_session_key(username, "authenticated")
-    st.session_state[user_session_key] = False
-    st.session_state[get_session_key(username, "username")] = None
-    cookies[f"{username}_authenticated"] = "false"
+    st.session_state["authenticated"] = False
+    st.session_state["username"] = None
+    st.session_state["session_id"] = None
+    cookies["authenticated"] = "false"
     cookies["username"] = ""
+    cookies["session_id"] = ""
     cookies.save()
     st.info("You have been logged out.")
     st.rerun()

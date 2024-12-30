@@ -1,17 +1,16 @@
 import streamlit as st
-from auth import login_page, logout, get_session_key
+from auth import login_page, logout, validate_session
 from scraper import scrape_youtube_results
 import pandas as pd
 
 def main(username):
     """Main app logic for a specific user."""
     st.title("YouTube Scraper")
-    user_key = lambda key: get_session_key(username, key)
 
+    st.subheader("Enter Keywords")
     keywords_input = st.text_area(
         "Enter keywords (one per line):",
-        placeholder="Type keywords here, one per line...",
-        key=user_key("keywords_input")
+        placeholder="Type keywords here, one per line..."
     )
 
     max_results = st.number_input(
@@ -19,19 +18,17 @@ def main(username):
         min_value=1,
         max_value=50,
         value=10,
-        step=1,
-        key=user_key("max_results")
+        step=1
     )
 
     min_subs = st.number_input(
         "Minimum Subscriber Count",
         min_value=0,
         value=0,
-        step=1,
-        key=user_key("min_subs")
+        step=1
     )
 
-    if st.button("Find Channels", key=user_key("find_channels")):
+    if st.button("Find Channels"):
         if not keywords_input.strip():
             st.error("Please enter at least one keyword.")
         else:
@@ -60,9 +57,11 @@ def main(username):
 
 # Control flow
 username = login_page()  # Handle login
-if username:
+if username and validate_session():
     logout_button_clicked = st.sidebar.button("Logout")
     if logout_button_clicked:
         logout(username)
     else:
         main(username)
+else:
+    login_page()

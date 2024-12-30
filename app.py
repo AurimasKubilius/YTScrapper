@@ -1,16 +1,19 @@
 import streamlit as st
-from auth import login_page, logout, validate_session
+from auth import login_page, logout, get_session_key
 from scraper import scrape_youtube_results
 import pandas as pd
 
-def main(username):
-    """Main app logic for a specific user."""
-    st.title("YouTube Scraper")
+def main():
+    """Main app logic."""
+    session_key_username = get_session_key("username")
+
+    st.title(f"YouTube Scraper for {st.session_state[session_key_username]}")
 
     st.subheader("Enter Keywords")
     keywords_input = st.text_area(
         "Enter keywords (one per line):",
-        placeholder="Type keywords here, one per line..."
+        placeholder="Type keywords here, one per line...",
+        key=get_session_key("keywords_input")
     )
 
     max_results = st.number_input(
@@ -18,17 +21,19 @@ def main(username):
         min_value=1,
         max_value=50,
         value=10,
-        step=1
+        step=1,
+        key=get_session_key("max_results")
     )
 
     min_subs = st.number_input(
         "Minimum Subscriber Count",
         min_value=0,
         value=0,
-        step=1
+        step=1,
+        key=get_session_key("min_subs")
     )
 
-    if st.button("Find Channels"):
+    if st.button("Find Channels", key=get_session_key("find_channels")):
         if not keywords_input.strip():
             st.error("Please enter at least one keyword.")
         else:
@@ -49,7 +54,7 @@ def main(username):
                 st.download_button(
                     label="Download Results as CSV",
                     data=csv,
-                    file_name=f"{username}_youtube_results.csv",
+                    file_name=f"{st.session_state[session_key_username]}_youtube_results.csv",
                     mime="text/csv",
                 )
             else:
@@ -57,11 +62,8 @@ def main(username):
 
 # Control flow
 username = login_page()  # Handle login
-if username and validate_session():
-    logout_button_clicked = st.sidebar.button("Logout")
-    if logout_button_clicked:
-        logout(username)
+if username:
+    if st.sidebar.button("Logout", key=get_session_key("logout_button")):
+        logout()
     else:
-        main(username)
-else:
-    login_page()
+        main()

@@ -1,6 +1,6 @@
+from streamlit_cookies_manager import EncryptedCookieManager
 import streamlit as st
 import uuid
-from streamlit_cookies_manager import EncryptedCookieManager
 
 # Set a secure password for cookie encryption
 COOKIE_PASSWORD = st.secrets["general"]["COOKIE_PASSWORD"]
@@ -8,6 +8,7 @@ COOKIE_PASSWORD = st.secrets["general"]["COOKIE_PASSWORD"]
 # Initialize the cookie manager
 cookies = EncryptedCookieManager(password=COOKIE_PASSWORD)
 
+# Wait for cookies to be ready before proceeding
 if not cookies.ready():
     st.stop()
 
@@ -22,6 +23,10 @@ def generate_session_id():
 
 def login_page():
     """Render the login page."""
+    # Ensure cookies are ready before accessing them
+    if not cookies.ready():
+        st.stop()
+
     # Restore login state if session ID exists and matches
     session_id = cookies.get("session_id")
     if session_id and cookies.get("authenticated") == "true":
@@ -53,6 +58,9 @@ def login_page():
 
 def validate_session():
     """Validate if the session ID in cookies matches the session state."""
+    if not cookies.ready():
+        st.stop()
+
     session_id = cookies.get("session_id")
     if not session_id or session_id != st.session_state.get("session_id"):
         st.session_state["authenticated"] = False

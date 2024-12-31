@@ -1,19 +1,19 @@
 import streamlit as st
-from auth import login_page, logout, get_session_key
 from scraper import scrape_youtube_results
 import pandas as pd
 
 def main():
     """Main app logic."""
-    session_key_username = get_session_key("username")
+    st.title("YouTube Scraper")
 
-    st.title(f"YouTube Scraper for {st.session_state[session_key_username]}")
+    st.subheader("Access Control")
+    password = st.text_input("Enter Access Password", type="password", key="access_password")
+    valid_passwords = st.secrets["general"]["valid_passwords"]
 
     st.subheader("Enter Keywords")
     keywords_input = st.text_area(
         "Enter keywords (one per line):",
-        placeholder="Type keywords here, one per line...",
-        key=get_session_key("keywords_input")
+        placeholder="Type keywords here, one per line..."
     )
 
     max_results = st.number_input(
@@ -21,20 +21,21 @@ def main():
         min_value=1,
         max_value=50,
         value=10,
-        step=1,
-        key=get_session_key("max_results")
+        step=1
     )
 
     min_subs = st.number_input(
         "Minimum Subscriber Count",
         min_value=0,
         value=0,
-        step=1,
-        key=get_session_key("min_subs")
+        step=1
     )
 
-    if st.button("Find Channels", key=get_session_key("find_channels")):
-        if not keywords_input.strip():
+    if st.button("Find Channels"):
+        # Validate password before proceeding
+        if password not in valid_passwords:
+            st.error("Invalid password. Please try again.")
+        elif not keywords_input.strip():
             st.error("Please enter at least one keyword.")
         else:
             keywords = [k.strip() for k in keywords_input.splitlines() if k.strip()]
@@ -54,16 +55,11 @@ def main():
                 st.download_button(
                     label="Download Results as CSV",
                     data=csv,
-                    file_name=f"{st.session_state[session_key_username]}_youtube_results.csv",
+                    file_name="youtube_results.csv",
                     mime="text/csv",
                 )
             else:
                 st.warning("No results found.")
 
-# Control flow
-username = login_page()  # Handle login
-if username:
-    if st.sidebar.button("Logout", key=get_session_key("logout_button")):
-        logout()
-    else:
-        main()
+if __name__ == "__main__":
+    main()
